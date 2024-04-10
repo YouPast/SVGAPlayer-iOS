@@ -6,7 +6,7 @@
 //  Copyright © 2017年 UED Center. All rights reserved.
 //
 
-#import "SVGAPlayer.h"
+#import <SVGA/SVGAPlayer.h>
 
 @interface SVGAImageView : SVGAPlayer
 
