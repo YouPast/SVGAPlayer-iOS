@@ -12,6 +12,7 @@
 #import "SVGAVideoSpriteEntity.h"
 #import "SVGAAudioEntity.h"
 #import "Svga.pbobjc.h"
+#import "UIImage+Resize.h"
 
 #define MP3_MAGIC_NUMBER "ID3"
 
@@ -29,6 +30,21 @@
 @end
 
 @implementation SVGAVideoEntity
+
+static inline UIImage *SVGAImageDecodeAndScaleDownUIKit(UIImage *image, CGSize destResolution) {
+    // See: https://developer.apple.com/documentation/uikit/uiimage/3750835-imagebypreparingthumbnailofsize
+    // Need CGImage-based
+    if (@available(iOS 15, tvOS 15, *)) {
+        // Calculate thumbnail point size
+        CGFloat scale = image.scale ?: 1;
+        CGSize thumbnailSize = CGSizeMake(destResolution.width / scale, destResolution.height / scale);
+        UIImage *decodedImage = [image imageByPreparingThumbnailOfSize:thumbnailSize];
+        if (decodedImage) {
+            return decodedImage;
+        }
+    }
+    return nil;
+}
 
 static NSCache *videoCache;
 static NSMapTable * weakCache;
@@ -135,6 +151,7 @@ static dispatch_semaphore_t videoSemaphore;
 - (void)resetMovieWithProtoObject:(SVGAProtoMovieEntity *)protoObject {
     if (protoObject.hasParams) {
         self.videoSize = CGSizeMake((CGFloat)protoObject.params.viewBoxWidth, (CGFloat)protoObject.params.viewBoxHeight);
+        NSLog(@"videosize: %.1f, %.1f",_videoSize.width,_videoSize.height);
         self.FPS = (int)protoObject.params.fps;
         self.frames = (int)protoObject.params.frames;
     }
@@ -152,6 +169,8 @@ static dispatch_semaphore_t videoSemaphore;
     NSMutableDictionary<NSString *, UIImage *> *images = [[NSMutableDictionary alloc] init];
     NSMutableDictionary<NSString *, NSData *> *audiosData = [[NSMutableDictionary alloc] init];
     NSDictionary *protoImages = [protoObject.images copy];
+    NSInteger bytecount = 0;
+    NSInteger memoryCount = 0;
     for (NSString *key in protoImages) {
         NSString *fileName = [[NSString alloc] initWithData:protoImages[key] encoding:NSUTF8StringEncoding];
         if (fileName != nil) {
@@ -175,15 +194,29 @@ static dispatch_semaphore_t videoSemaphore;
                 // mp3
                 [audiosData setObject:protoImages[key] forKey:key];
             } else {
-                UIImage *image = [[UIImage alloc] initWithData:protoImages[key] scale:2.0];
-                if (image != nil) {
-                    [images setObject:image forKey:key];
+                NSData *data = protoImages[key];
+                UIImage *image = [[UIImage alloc] initWithData:data scale:2.0];
+                UIImage *scaledImage;
+                if ((self.targetSize.width > 0 && self.targetSize.height > 0) && (self.targetSize.width < image.size.width && self.targetSize.height < image.size.height)) {
+                    scaledImage = SVGAImageDecodeAndScaleDownUIKit(image,self.targetSize);
+                    if (!scaledImage) {
+                        // fill
+                        scaledImage = [image scaleToFillSize:self.targetSize mode:0 scale:image.scale?:1];
+                    }
+                }else {
+                    scaledImage = image;
                 }
+                if (scaledImage != nil) {
+                    [images setObject:scaledImage forKey:key];
+                }
+                memoryCount += [scaledImage costForImage];
+                bytecount += data.length;
             }
         }
     }
     self.images = images;
     self.audiosData = audiosData;
+    NSLog(@"filesize: %.1f kb , memorycost: %.1f kb",bytecount/1024.0,memoryCount/1024.0);
 }
 
 - (void)resetSpritesWithProtoObject:(SVGAProtoMovieEntity *)protoObject {

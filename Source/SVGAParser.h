@@ -13,6 +13,7 @@
 @interface SVGAParser : NSObject
 
 @property (nonatomic, assign) BOOL enabledMemoryCache;
+@property (nonatomic, assign) CGSize targetSize;
 
 - (void)parseWithURL:(nonnull NSURL *)URL
      completionBlock:(void ( ^ _Nonnull )(SVGAVideoEntity * _Nullable videoItem))completionBlock

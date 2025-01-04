@@ -72,6 +72,9 @@
 		B78833562BC64B1B000474C2 /* SVGAContentLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B788333B2BC64B1B000474C2 /* SVGAContentLayer.m */; };
 		B78833582BC64BE9000474C2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = B78833572BC64BE0000474C2 /* libz.tbd */; };
 		E83A58D9247E0E6A00D9F404 /* audio_biling.svga in Resources */ = {isa = PBXBuildFile; fileRef = E83A58D8247E0E6A00D9F404 /* audio_biling.svga */; };
+		EFF7B0AF2D281CAD00404F60 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = EFF7B0AE2D281CAD00404F60 /* UIImage+Resize.m */; };
+		EFF7B0B02D281CAD00404F60 /* UIImage+Resize.h in Headers */ = {isa = PBXBuildFile; fileRef = EFF7B0AD2D281CAD00404F60 /* UIImage+Resize.h */; };
+		EFF7B0B12D281CAD00404F60 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = EFF7B0AE2D281CAD00404F60 /* UIImage+Resize.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -163,6 +166,9 @@
 		B78833572BC64BE0000474C2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.4.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
 		E02B8713B25C0283C736EE03 /* Pods-SVGAPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SVGAPlayer.release.xcconfig"; path = "Pods/Target Support Files/Pods-SVGAPlayer/Pods-SVGAPlayer.release.xcconfig"; sourceTree = "<group>"; };
 		E83A58D8247E0E6A00D9F404 /* audio_biling.svga */ = {isa = PBXFileReference; lastKnownFileType = file; path = audio_biling.svga; sourceTree = "<group>"; };
+		EFF7B0AC2D27FC4D00404F60 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		EFF7B0AD2D281CAD00404F60 /* UIImage+Resize.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Resize.h"; sourceTree = "<group>"; };
+		EFF7B0AE2D281CAD00404F60 /* UIImage+Resize.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Resize.m"; sourceTree = "<group>"; };
 		FAA02C4EB96718C5A12970B6 /* Pods-SVGA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SVGA.release.xcconfig"; path = "Pods/Target Support Files/Pods-SVGA/Pods-SVGA.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -202,6 +208,7 @@
 		90A676D41D13A6DF008A69F3 = {
 			isa = PBXGroup;
 			children = (
+				EFF7B0AC2D27FC4D00404F60 /* Package.swift */,
 				90A676F71D13A70E008A69F3 /* Source */,
 				90A676DF1D13A6DF008A69F3 /* SVGAPlayer */,
 				B78833162BC64A9F000474C2 /* SVGA */,
@@ -278,6 +285,8 @@
 				9052FC621E6EB8D4007BC925 /* SVGAExporter.m */,
 				904D41F61D223DD20085A21A /* SVGABezierPath.h */,
 				904D41F71D223DD20085A21A /* SVGABezierPath.m */,
+				EFF7B0AD2D281CAD00404F60 /* UIImage+Resize.h */,
+				EFF7B0AE2D281CAD00404F60 /* UIImage+Resize.m */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -375,6 +384,7 @@
 				B788334D2BC64B1B000474C2 /* SVGAParser.h in Headers */,
 				B788334C2BC64B1B000474C2 /* SVGAExporter.h in Headers */,
 				B78833452BC64B1B000474C2 /* SVGAVideoEntity.h in Headers */,
+				EFF7B0B02D281CAD00404F60 /* UIImage+Resize.h in Headers */,
 				B78833552BC64B1B000474C2 /* SVGAImageView.h in Headers */,
 				B78833532BC64B1B000474C2 /* SVGAPlayer.h in Headers */,
 				B788334B2BC64B1B000474C2 /* SVGAVideoSpriteEntity.h in Headers */,
@@ -551,6 +561,7 @@
 				90A677031D13AE19008A69F3 /* SVGAVideoEntity.m in Sources */,
 				90A364DA1E5AED04009347F1 /* SVGAVideoSpriteFrameEntity.m in Sources */,
 				63712E6821787A45001AE014 /* SVGAAudioEntity.m in Sources */,
+				EFF7B0AF2D281CAD00404F60 /* UIImage+Resize.m in Sources */,
 				63E817012178809D001D2D62 /* SVGAAudioLayer.m in Sources */,
 				90A364D11E5AEC11009347F1 /* SVGABitmapLayer.m in Sources */,
 				904D41F81D223DD20085A21A /* SVGABezierPath.m in Sources */,
@@ -580,6 +591,7 @@
 				B788333C2BC64B1B000474C2 /* SVGA.m in Sources */,
 				B78833442BC64B1B000474C2 /* SVGAAudioLayer.m in Sources */,
 				B788333E2BC64B1B000474C2 /* SVGAVideoSpriteEntity.m in Sources */,
+				EFF7B0B12D281CAD00404F60 /* UIImage+Resize.m in Sources */,
 				B78833202BC64B0C000474C2 /* Svga.pbobjc.m in Sources */,
 				B78833542BC64B1B000474C2 /* SVGAVideoEntity.m in Sources */,
 				B788334F2BC64B1B000474C2 /* SVGAAudioEntity.m in Sources */,
