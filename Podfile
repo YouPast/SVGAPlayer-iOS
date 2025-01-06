@@ -1,11 +1,11 @@
 platform :ios, '12.0'
 
-target 'SVGAPlayer' do
+target 'SVGAPlayerDemo' do
     pod 'SSZipArchive', '~> 2.1.4'
     pod 'Protobuf', '~> 3.4'
 end
 
-target 'SVGA' do
+target 'SVGAPlayer' do
     pod 'SSZipArchive', '~> 2.1.4'
     pod 'Protobuf', '~> 3.4'
 end

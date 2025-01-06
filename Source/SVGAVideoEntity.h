@@ -22,6 +22,8 @@
 @property (nonatomic, readonly) NSArray<SVGAVideoSpriteEntity *> *sprites;
 @property (nonatomic, readonly) NSArray<SVGAAudioEntity *> *audios;
 @property (nonatomic, assign) CGSize targetSize;
+@property (nonatomic,readonly) NSInteger bytecount;
+@property (nonatomic,readonly) NSInteger memoryCount;
 
 - (instancetype)initWithJSONObject:(NSDictionary *)JSONObject cacheDir:(NSString *)cacheDir;
 - (void)resetImagesWithJSONObject:(NSDictionary *)JSONObject;

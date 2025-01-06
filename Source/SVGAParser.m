@@ -161,6 +161,7 @@ static NSOperationQueue *unzipQueue;
                 NSDictionary *JSONObject = [NSJSONSerialization JSONObjectWithData:JSONData options:kNilOptions error:&err];
                 if ([JSONObject isKindOfClass:[NSDictionary class]]) {
                     SVGAVideoEntity *videoItem = [[SVGAVideoEntity alloc] initWithJSONObject:JSONObject cacheDir:cacheDir];
+                    videoItem.targetSize = self.targetSize;
                     [videoItem resetImagesWithJSONObject:JSONObject];
                     [videoItem resetSpritesWithJSONObject:JSONObject];
                     if (self.enabledMemoryCache) {
@@ -282,6 +283,7 @@ static NSOperationQueue *unzipQueue;
                             SVGAProtoMovieEntity *protoObject = [SVGAProtoMovieEntity parseFromData:protoData error:&err];
                             if (!err) {
                                 SVGAVideoEntity *videoItem = [[SVGAVideoEntity alloc] initWithProtoObject:protoObject cacheDir:cacheDir];
+                                videoItem.targetSize = self.targetSize;
                                 [videoItem resetImagesWithProtoObject:protoObject];
                                 [videoItem resetSpritesWithProtoObject:protoObject];
                                 if (self.enabledMemoryCache) {
@@ -310,6 +312,7 @@ static NSOperationQueue *unzipQueue;
                                 NSDictionary *JSONObject = [NSJSONSerialization JSONObjectWithData:JSONData options:kNilOptions error:&err];
                                 if ([JSONObject isKindOfClass:[NSDictionary class]]) {
                                     SVGAVideoEntity *videoItem = [[SVGAVideoEntity alloc] initWithJSONObject:JSONObject cacheDir:cacheDir];
+                                    videoItem.targetSize = self.targetSize;
                                     [videoItem resetImagesWithJSONObject:JSONObject];
                                     [videoItem resetSpritesWithJSONObject:JSONObject];
                                     if (self.enabledMemoryCache) {

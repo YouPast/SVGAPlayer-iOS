@@ -13,7 +13,7 @@
 #import "SVGAAudioEntity.h"
 #import "Svga.pbobjc.h"
 #import "UIImage+Resize.h"
-
+#import "SVGA.h"
 #define MP3_MAGIC_NUMBER "ID3"
 
 @interface SVGAVideoEntity ()
@@ -26,7 +26,8 @@
 @property (nonatomic, copy) NSArray<SVGAVideoSpriteEntity *> *sprites;
 @property (nonatomic, copy) NSArray<SVGAAudioEntity *> *audios;
 @property (nonatomic, copy) NSString *cacheDir;
-
+@property (nonatomic,assign) NSInteger bytecount;
+@property (nonatomic,assign) NSInteger memoryCount;
 @end
 
 @implementation SVGAVideoEntity
@@ -109,9 +110,15 @@ static dispatch_semaphore_t videoSemaphore;
                     NSData *imageData = [NSData dataWithContentsOfFile:filePath options:NSDataReadingMappedIfSafe error:NULL];
                     if (imageData != nil) {
                         UIImage *image = [[UIImage alloc] initWithData:imageData scale:2.0];
-                        if (image != nil) {
-                            [images setObject:image forKey:[key stringByDeletingPathExtension]];
+                        UIImage *scaledImage = [self resizeImageIfNeed:image];
+                        if (scaledImage != nil) {
+                            [images setObject:scaledImage forKey:[key stringByDeletingPathExtension]];
                         }
+                        if (self.enableDebug) {
+                            self.memoryCount += [scaledImage costForImage];
+                            self.bytecount += imageData.length;
+                        }
+                        
                     }
                 }
             }];
@@ -165,59 +172,72 @@ static dispatch_semaphore_t videoSemaphore;
     return result;
 }
 
+
+
 - (void)resetImagesWithProtoObject:(SVGAProtoMovieEntity *)protoObject {
     NSMutableDictionary<NSString *, UIImage *> *images = [[NSMutableDictionary alloc] init];
     NSMutableDictionary<NSString *, NSData *> *audiosData = [[NSMutableDictionary alloc] init];
     NSDictionary *protoImages = [protoObject.images copy];
-    NSInteger bytecount = 0;
-    NSInteger memoryCount = 0;
+    self.bytecount = 0;
+    self.memoryCount = 0;
+    dispatch_queue_t currentQueue = dispatch_get_current_queue();
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     for (NSString *key in protoImages) {
-        NSString *fileName = [[NSString alloc] initWithData:protoImages[key] encoding:NSUTF8StringEncoding];
-        if (fileName != nil) {
-            NSString *filePath = [self.cacheDir stringByAppendingFormat:@"/%@.png", fileName];
-            if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-                filePath = [self.cacheDir stringByAppendingFormat:@"/%@", fileName];
-            }
-            if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-//                NSData *imageData = [NSData dataWithContentsOfFile:filePath];
-                NSData *imageData = [NSData dataWithContentsOfFile:filePath options:NSDataReadingMappedIfSafe error:NULL];
-                if (imageData != nil) {
-                    UIImage *image = [[UIImage alloc] initWithData:imageData scale:2.0];
-                    if (image != nil) {
-                        [images setObject:image forKey:key];
+        dispatch_group_async(group, queue, ^{
+            NSString *fileName = [[NSString alloc] initWithData:protoImages[key] encoding:NSUTF8StringEncoding];
+            if (fileName != nil) {
+                NSString *filePath = [self.cacheDir stringByAppendingFormat:@"/%@.png", fileName];
+                if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+                    filePath = [self.cacheDir stringByAppendingFormat:@"/%@", fileName];
+                }
+                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+    //                NSData *imageData = [NSData dataWithContentsOfFile:filePath];
+                    NSData *imageData = [NSData dataWithContentsOfFile:filePath options:NSDataReadingMappedIfSafe error:NULL];
+                    if (imageData != nil) {
+                        UIImage *image = [[UIImage alloc] initWithData:imageData scale:2.0];
+                        if (image != nil) {
+                            @synchronized (images) {
+                                [images setObject:image forKey:key];
+                            }
+                            
+                        }
                     }
                 }
             }
-        }
-        else if ([protoImages[key] isKindOfClass:[NSData class]]) {
-            if ([SVGAVideoEntity isMP3Data:protoImages[key]]) {
-                // mp3
-                [audiosData setObject:protoImages[key] forKey:key];
-            } else {
-                NSData *data = protoImages[key];
-                UIImage *image = [[UIImage alloc] initWithData:data scale:2.0];
-                UIImage *scaledImage;
-                if ((self.targetSize.width > 0 && self.targetSize.height > 0) && (self.targetSize.width < image.size.width && self.targetSize.height < image.size.height)) {
-                    scaledImage = SVGAImageDecodeAndScaleDownUIKit(image,self.targetSize);
-                    if (!scaledImage) {
-                        // fill
-                        scaledImage = [image scaleToFillSize:self.targetSize mode:0 scale:image.scale?:1];
+            else if ([protoImages[key] isKindOfClass:[NSData class]]) {
+                if ([SVGAVideoEntity isMP3Data:protoImages[key]]) {
+                    // mp3
+                    [audiosData setObject:protoImages[key] forKey:key];
+                } else {
+                    NSData *data = protoImages[key];
+                    UIImage *image = [[UIImage alloc] initWithData:data scale:2.0];
+                    UIImage *scaledImage = [self resizeImageIfNeed:image];
+                    if (scaledImage != nil) {
+                        @synchronized (images) {
+                            [images setObject:scaledImage forKey:key];
+                        }
+                        
                     }
-                }else {
-                    scaledImage = image;
+                    if (self.enableDebug) {
+                        self.memoryCount += [scaledImage costForImage];
+                        self.bytecount += data.length;
+                    }
                 }
-                if (scaledImage != nil) {
-                    [images setObject:scaledImage forKey:key];
-                }
-                memoryCount += [scaledImage costForImage];
-                bytecount += data.length;
             }
-        }
+        });
+        
     }
-    self.images = images;
-    self.audiosData = audiosData;
-    NSLog(@"filesize: %.1f kb , memorycost: %.1f kb",bytecount/1024.0,memoryCount/1024.0);
+    dispatch_group_notify(group, currentQueue, ^{
+        self.images = images;
+        self.audiosData = audiosData;
+        if (self.enableDebug) {
+            NSLog(@"SVGA filesize: %.1f kb , memorycost: %.1f kb", self.bytecount / 1024.0, self.memoryCount / 1024.0);
+        }
+        
+    });
 }
+
 
 - (void)resetSpritesWithProtoObject:(SVGAProtoMovieEntity *)protoObject {
     NSMutableArray<SVGAVideoSpriteEntity *> *sprites = [[NSMutableArray alloc] init];
@@ -264,6 +284,26 @@ static dispatch_semaphore_t videoSemaphore;
     dispatch_semaphore_wait(videoSemaphore, DISPATCH_TIME_FOREVER);
     [weakCache setObject:self forKey:cacheKey];
     dispatch_semaphore_signal(videoSemaphore);
+}
+
+
+
+- (UIImage *)resizeImageIfNeed:(UIImage *)image {
+    UIImage *scaledImage;
+    if ((self.targetSize.width > 0 && self.targetSize.height > 0) && (self.targetSize.width < image.size.width && self.targetSize.height < image.size.height)) {
+        scaledImage = SVGAImageDecodeAndScaleDownUIKit(image,self.targetSize);
+        if (!scaledImage) {
+            // fill
+            scaledImage = [image scaleToFillSize:self.targetSize mode:0 scale:image.scale?:1];
+        }
+    }else {
+        scaledImage = image;
+    }
+    return scaledImage;
+}
+
+- (BOOL)enableDebug {
+    return [[SVGA shared] enableDebug];
 }
 
 @end

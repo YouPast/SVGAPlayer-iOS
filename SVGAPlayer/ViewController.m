@@ -20,9 +20,14 @@
 @implementation ViewController
 
 static SVGAParser *parser;
++ (void)initialize {
+    [[SVGA shared] setEnableDebug: YES];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    
     self.aPlayer.delegate = self;
     self.aPlayer.loops = 1;
     self.aPlayer.clearsAfterStop = YES;

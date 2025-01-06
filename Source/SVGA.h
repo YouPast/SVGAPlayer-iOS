@@ -14,5 +14,7 @@
 #import "SVGAExporter.h"
 
 @interface SVGA : NSObject
-
++ (SVGA *)shared;
+- (void)setEnableDebug:(BOOL)enableDebug;
+- (BOOL)enableDebug;
 @end

@@ -15,6 +15,9 @@
 #import "SVGAVectorLayer.h"
 #import "SVGAAudioLayer.h"
 #import "SVGAAudioEntity.h"
+#import "SVGA.h"
+#import "DebugInfoView.h"
+
 
 @interface SVGAPlayer ()
 
@@ -31,6 +34,7 @@
 @property (nonatomic, assign) NSRange currentRange;
 @property (nonatomic, assign) BOOL forwardAnimating;
 @property (nonatomic, assign) BOOL reversing;
+@property (nonatomic, strong) DebugInfoView *infoView;
 
 @end 
 
@@ -60,6 +64,10 @@
 - (void)initPlayer {
     self.contentMode = UIViewContentModeTop;
     self.clearsAfterStop = YES;
+    if ([self enableDebug]) {
+        _infoView = [[DebugInfoView alloc] initWithFrame:CGRectMake(0, 0, 100, 80)];
+        [self addSubview:_infoView];
+    }
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
@@ -416,6 +424,8 @@
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self clear];
         [self draw];
+        [self updateInfoView];
+        
     }];
 }
 
@@ -555,4 +565,22 @@
     return _mainRunLoopMode;
 }
 
+
+- (void)updateInfoView {
+    if (_videoItem != nil) {
+        //NSLog(@"filesize: %.1f kb , memorycost: %.1f kb",self.bytecount/1024.0,self.memoryCount/1024.0);
+        NSString *videoSizeInfo = [NSString stringWithFormat:@"(%.0f,%.0f)",_videoItem.videoSize.width,_videoItem.videoSize.height];
+        NSString *targetSizeInfo = [NSString stringWithFormat:@"(%.0f,%.0f)",_videoItem.targetSize.width,_videoItem.targetSize.height];
+        NSString *fileSize = [NSString stringWithFormat:@"%.1f kb",_videoItem.bytecount/1024.0];
+        NSString *mcost = [NSString stringWithFormat:@"%.1f kb",_videoItem.memoryCount/1024.0];
+        NSString *text = [NSString stringWithFormat:@"%@,%@ \n %@ \n %@",videoSizeInfo,targetSizeInfo,fileSize,mcost];
+        [_infoView updateWithText:text];
+        [self bringSubviewToFront:_infoView];
+    }
+
+}
+
+- (BOOL)enableDebug {
+    return [[SVGA shared] enableDebug];
+}
 @end
