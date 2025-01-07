@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "SVGA.h"
+#import "SVGAPlayer.h"
 
 @interface ViewController ()<SVGAPlayerDelegate>
 
@@ -32,7 +32,7 @@ static SVGAParser *parser;
     self.aPlayer.loops = 1;
     self.aPlayer.clearsAfterStop = YES;
     parser = [[SVGAParser alloc] init];
-    parser.targetSize = CGSizeMake(375, 375);
+//    parser.targetSize = CGSizeMake(375, 375);
     [self onChange:nil];
 }
 

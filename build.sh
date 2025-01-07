@@ -3,7 +3,7 @@ rm -rf build
 #For iOS Device
 xcodebuild clean archive \
 -workspace "SVGAPlayer.xcworkspace" \
--scheme SVGA \
+-scheme SVGAPlayer \
 -sdk iphoneos \
 -configuration Release \
 -destination 'generic/platform=iOS' \
@@ -14,7 +14,7 @@ BUILD_LIBRARIES_FOR_DISTRIBUTION=YES
 
 xcodebuild clean archive \
 -workspace "SVGAPlayer.xcworkspace" \
--scheme SVGA \
+-scheme SVGAPlayer \
 -sdk iphoneos \
 -configuration Release \
 -destination 'generic/platform=iOS Simulator' \
@@ -24,6 +24,6 @@ BUILD_LIBRARIES_FOR_DISTRIBUTION=YES
 
 
 xcodebuild -create-xcframework \
--framework './build/SVGAPlayer.framework-iphonesimulator.xcarchive/Products/Library/Frameworks/SVGA.framework' \
--framework './build/SVGAPlayer.framework-iphoneos.xcarchive/Products/Library/Frameworks/SVGA.framework' \
+-framework './build/SVGAPlayer.framework-iphonesimulator.xcarchive/Products/Library/Frameworks/SVGAPlayer.framework' \
+-framework './build/SVGAPlayer.framework-iphoneos.xcarchive/Products/Library/Frameworks/SVGAPlayer.framework' \
 -output './build/SVGAPlayer.xcframework'

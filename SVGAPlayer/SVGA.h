@@ -9,17 +9,18 @@
 #import <Foundation/Foundation.h>
 
 //! Project version number for SVGA.
-FOUNDATION_EXPORT double SVGAVersionNumber;
-
-//! Project version string for SVGA.
-FOUNDATION_EXPORT const unsigned char SVGAVersionString[];
+//FOUNDATION_EXPORT double SVGAVersionNumber;
+//
+////! Project version string for SVGA.
+//FOUNDATION_EXPORT const unsigned char SVGAVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <SVGA/PublicHeader.h>
-#import <SVGA/SVGAParser.h>
-#import <SVGA/SVGAPlayer.h>
-#import <SVGA/SVGAImageView.h>
-#import <SVGA/SVGAVideoEntity.h>
-#import <SVGA/SVGAExporter.h>
+//#import <SVGAPlayer/SVGAParser.h>
+//#import <SVGAPlayer/SVGAPlayer.h>
+//#import <SVGAPlayer/SVGAImageView.h>
+//#import <SVGAPlayer/SVGAVideoEntity.h>
+//#import <SVGAPlayer/SVGAExporter.h>
+
 
 @interface SVGA : NSObject
 + (SVGA *)shared;

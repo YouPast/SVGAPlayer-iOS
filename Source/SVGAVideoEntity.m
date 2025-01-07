@@ -180,62 +180,50 @@ static dispatch_semaphore_t videoSemaphore;
     NSDictionary *protoImages = [protoObject.images copy];
     self.bytecount = 0;
     self.memoryCount = 0;
-    dispatch_queue_t currentQueue = dispatch_get_current_queue();
-    dispatch_group_t group = dispatch_group_create();
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     for (NSString *key in protoImages) {
-        dispatch_group_async(group, queue, ^{
-            NSString *fileName = [[NSString alloc] initWithData:protoImages[key] encoding:NSUTF8StringEncoding];
-            if (fileName != nil) {
-                NSString *filePath = [self.cacheDir stringByAppendingFormat:@"/%@.png", fileName];
-                if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-                    filePath = [self.cacheDir stringByAppendingFormat:@"/%@", fileName];
-                }
-                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
-    //                NSData *imageData = [NSData dataWithContentsOfFile:filePath];
-                    NSData *imageData = [NSData dataWithContentsOfFile:filePath options:NSDataReadingMappedIfSafe error:NULL];
-                    if (imageData != nil) {
-                        UIImage *image = [[UIImage alloc] initWithData:imageData scale:2.0];
-                        if (image != nil) {
-                            @synchronized (images) {
-                                [images setObject:image forKey:key];
-                            }
-                            
-                        }
+        NSString *fileName = [[NSString alloc] initWithData:protoImages[key] encoding:NSUTF8StringEncoding];
+        if (fileName != nil) {
+            NSString *filePath = [self.cacheDir stringByAppendingFormat:@"/%@.png", fileName];
+            if (![[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+                filePath = [self.cacheDir stringByAppendingFormat:@"/%@", fileName];
+            }
+            if ([[NSFileManager defaultManager] fileExistsAtPath:filePath]) {
+//                NSData *imageData = [NSData dataWithContentsOfFile:filePath];
+                NSData *imageData = [NSData dataWithContentsOfFile:filePath options:NSDataReadingMappedIfSafe error:NULL];
+                if (imageData != nil) {
+                    UIImage *image = [[UIImage alloc] initWithData:imageData scale:2.0];
+                    if (image != nil) {
+                        [images setObject:image forKey:key];
                     }
                 }
             }
-            else if ([protoImages[key] isKindOfClass:[NSData class]]) {
-                if ([SVGAVideoEntity isMP3Data:protoImages[key]]) {
-                    // mp3
-                    [audiosData setObject:protoImages[key] forKey:key];
-                } else {
-                    NSData *data = protoImages[key];
-                    UIImage *image = [[UIImage alloc] initWithData:data scale:2.0];
-                    UIImage *scaledImage = [self resizeImageIfNeed:image];
-                    if (scaledImage != nil) {
-                        @synchronized (images) {
-                            [images setObject:scaledImage forKey:key];
-                        }
-                        
-                    }
-                    if (self.enableDebug) {
-                        self.memoryCount += [scaledImage costForImage];
-                        self.bytecount += data.length;
-                    }
-                }
-            }
-        });
-        
-    }
-    dispatch_group_notify(group, currentQueue, ^{
-        self.images = images;
-        self.audiosData = audiosData;
-        if (self.enableDebug) {
-            NSLog(@"SVGA filesize: %.1f kb , memorycost: %.1f kb", self.bytecount / 1024.0, self.memoryCount / 1024.0);
         }
-        
-    });
+        else if ([protoImages[key] isKindOfClass:[NSData class]]) {
+            if ([SVGAVideoEntity isMP3Data:protoImages[key]]) {
+                // mp3
+                [audiosData setObject:protoImages[key] forKey:key];
+            } else {
+                NSData *data = protoImages[key];
+                UIImage *image = [[UIImage alloc] initWithData:data scale:2.0];
+                UIImage *scaledImage = [self resizeImageIfNeed:image];
+                if (scaledImage != nil) {
+                    
+                    [images setObject:scaledImage forKey:key];
+                    
+                    
+                }
+                if (self.enableDebug) {
+                    self.memoryCount += [scaledImage costForImage];
+                    self.bytecount += data.length;
+                }
+            }
+        }
+    }
+    self.images = images;
+    self.audiosData = audiosData;
+    if (self.enableDebug) {
+        NSLog(@"SVGA filesize: %.1f kb , memorycost: %.1f kb", self.bytecount / 1024.0, self.memoryCount / 1024.0);
+    }
 }
 
 

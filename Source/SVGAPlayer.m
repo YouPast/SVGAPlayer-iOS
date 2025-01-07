@@ -6,7 +6,7 @@
 //  Copyright © 2016年 UED Center. All rights reserved.
 //
 
-#import "SVGAPlayer.h"
+#import "SVGAPlayer+public.h"
 #import "SVGAVideoEntity.h"
 #import "SVGAVideoSpriteEntity.h"
 #import "SVGAVideoSpriteFrameEntity.h"
@@ -17,6 +17,7 @@
 #import "SVGAAudioEntity.h"
 #import "SVGA.h"
 #import "DebugInfoView.h"
+
 
 
 @interface SVGAPlayer ()

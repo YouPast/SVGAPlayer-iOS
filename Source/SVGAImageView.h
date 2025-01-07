@@ -6,8 +6,7 @@
 //  Copyright © 2017年 UED Center. All rights reserved.
 //
 
-#import <SVGA/SVGAPlayer.h>
-
+#import <SVGAPlayer/SVGAPlayer+public.h>
 @interface SVGAImageView : SVGAPlayer
 
 @property (nonatomic, assign) IBInspectable BOOL autoPlay;
