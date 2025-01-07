@@ -160,6 +160,25 @@
     }
 }
 
+- (void)setAudiosVolums:(float)volume {
+    for (SVGAAudioLayer *layer in self.audioLayers) {
+        if (layer.audioPlaying) {
+            [layer.audioPlayer setVolume:volume];
+        }
+    }
+}
+
+- (void)setMute:(BOOL)mute {
+    if (_mute != mute) {
+        _mute = mute;
+        if (mute) {
+            [self setAudiosVolums:0.0];
+        }else {
+            [self setAudiosVolums:1.0];
+        }
+    }
+}
+
 - (void)stepToFrame:(NSInteger)frame andPlay:(BOOL)andPlay {
     if (self.videoItem == nil) {
         NSLog(@"videoItem could not be nil！");
@@ -356,6 +375,11 @@
         for (SVGAAudioLayer *layer in self.audioLayers) {
             if (!layer.audioPlaying && layer.audioItem.startFrame <= self.currentFrame && self.currentFrame <= layer.audioItem.endFrame) {
                 [layer.audioPlayer setCurrentTime:(NSTimeInterval)(layer.audioItem.startTime / 1000)];
+                if (self.mute) {
+                    [layer.audioPlayer setVolume:0.0];
+                }else {
+                    [layer.audioPlayer setVolume:1.0];
+                }
                 [layer.audioPlayer play];
                 layer.audioPlaying = YES;
             }
