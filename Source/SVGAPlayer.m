@@ -17,8 +17,15 @@
 #import "SVGAAudioEntity.h"
 #import "SVGA.h"
 #import "DebugInfoView.h"
+#import <pthread.h>
 
-
+static inline void svg_dispatch_async_on_main_queue(void (^block)(void)) {
+    if (pthread_main_np()) {
+        block();
+    } else {
+        dispatch_async(dispatch_get_main_queue(), block);
+    }
+}
 
 @interface SVGAPlayer ()
 
@@ -75,8 +82,29 @@
     [super willMoveToSuperview:newSuperview];
     if (newSuperview == nil) {
         [self stopAnimation:YES];
+#if DEBUG
+        NSLog(@"willMoveToSuperview stopAnimation Clear YES");
+#endif
     }
 }
+
+- (void)willMoveToWindow:(UIWindow *)newWindow {
+    [super willMoveToWindow:newWindow];
+    if (newWindow == nil) {
+        // 当前视图将从屏幕移除，停止动画
+        [self pauseAnimation];
+#if DEBUG
+        NSLog(@"willMoveToWindow stopAnimation Clear NO");
+#endif
+    } else {
+        // 当前视图将显示在屏幕上，启动动画
+        [self startAnimation];
+#if DEBUG
+        NSLog(@"willMoveToWindow startAnimation");
+#endif
+    }
+}
+
 
 - (void)startAnimation {
     if (self.videoItem == nil) {
@@ -446,12 +474,12 @@
     _reversing = NO;
     _currentFrame = 0;
     _loopCount = 0;
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+    
+    svg_dispatch_async_on_main_queue(^{
         [self clear];
         [self draw];
         [self updateInfoView];
-        
-    }];
+    });
 }
 
 #pragma mark - Dynamic Object
@@ -477,9 +505,9 @@
         if (error == nil && data != nil) {
             UIImage *image = [UIImage imageWithData:data];
             if (image != nil) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                svg_dispatch_async_on_main_queue(^{
                     [self setImage:image forKey:aKey];
-                }];
+                });
             }
         }
     }] resume];

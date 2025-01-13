@@ -282,7 +282,7 @@ static dispatch_semaphore_t videoSemaphore;
         scaledImage = SVGAImageDecodeAndScaleDownUIKit(image,self.targetSize);
         if (!scaledImage) {
             // fill
-            scaledImage = [image scaleToFillSize:self.targetSize mode:0 scale:image.scale?:1];
+            scaledImage = [image scaleToFillSize:self.targetSize mode:0 scale:image.scale?:2];
         }
     }else {
         scaledImage = image;
