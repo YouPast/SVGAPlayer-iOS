@@ -37,7 +37,7 @@ static inline UIImage *SVGAImageDecodeAndScaleDownUIKit(UIImage *image, CGSize d
     // Need CGImage-based
     if (@available(iOS 15, tvOS 15, *)) {
         // Calculate thumbnail point size
-        CGFloat scale = image.scale ?: 1;
+        CGFloat scale = image.scale ?: 2;
         CGSize thumbnailSize = CGSizeMake(destResolution.width / scale, destResolution.height / scale);
         UIImage *decodedImage = [image imageByPreparingThumbnailOfSize:thumbnailSize];
         if (decodedImage) {
